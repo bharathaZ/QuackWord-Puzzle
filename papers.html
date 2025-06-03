@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Papers - Academic Portfolio</title>
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="nav-container">
+                <h1>Gihan Jayatilaka</h1>
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="biography.html">Biography</a></li>
+                    <li><a href="papers.html" class="active">Papers</a></li>
+                    <li><a href="lectures.html">Lectures</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="papers">
+            <h2>Research Papers</h2>
+            
+            <div class="paper-filters">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="published">Published</button>
+                <button class="filter-btn" data-filter="preprint">Preprints</button>
+            </div>
+
+            <div class="papers-grid">
+                <article class="paper-item published">
+                    <h3>Unified Spatio-Temporal Tri-Perspective View Representation for 3D Semantic Occupancy Prediction</h3>
+                    <p class="paper-meta">Best Paper Award, ML4AD Workshop, AAAI 2025</p>
+                    <p class="paper-abstract">Abstract: Novel approach to 3D semantic occupancy prediction using unified spatio-temporal representations with multiple perspective views.</p>
+                    <div class="paper-links">
+                        <a href="papers/aaai2025.pdf" class="button" target="_blank">Download PDF</a>
+                        <a href="#" class="button">View Presentation</a>
+                    </div>
+                </article>
+
+                <article class="paper-item published">
+                    <h3>DeepLight: Robust & Unobtrusive Real-time Screen-Camera Communication for Real-World Displays</h3>
+                    <p class="paper-meta">Best Artifact Award, IPSN 2021</p>
+                    <p class="paper-abstract">Abstract: A novel approach for robust screen-camera communication, with implementation and extensive evaluation on real-world displays.</p>
+                    <div class="paper-links">
+                        <a href="https://github.com/gihanjayatilaka/deeplight/" class="button" target="_blank">View Code</a>
+                        <a href="papers/ipsn2021.pdf" class="button" target="_blank">Download PDF</a>
+                    </div>
+                </article>
+
+                <article class="paper-item preprint">
+                    <h3>Utilization of Neighbor Information for Image Classification with Different Levels of Supervision</h3>
+                    <p class="paper-meta">Preprint, 2024</p>
+                    <p class="paper-abstract">Abstract: Novel approach to leveraging neighborhood information for improving image classification under varying levels of supervision.</p>
+                    <div class="paper-links">
+                        <a href="papers/unic2024.pdf" class="button" target="_blank">Download PDF</a>
+                        <a href="#" class="button">View Code</a>
+                    </div>
+                </article>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Gihan Jayatilaka. All rights reserved.</p>
+    </footer>
+
+    <script src="scripts/main.js"></script>
+</body>
+</html> 

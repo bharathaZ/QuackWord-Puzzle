@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ducks on Desk</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        canvas {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas" width="800" height="400"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Parameters
+        const duckSpacing = 120;
+        const duckCount = 5;
+        let time = 0;
+
+        function drawDrawer(x, y, width, height, openAmount) {
+            // Draw drawer box interior (dark)
+            ctx.fillStyle = '#3E2723';
+            ctx.fillRect(x, y, width, height + openAmount * 20);
+
+            // Draw drawer sides with perspective
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(x - openAmount * 15, y + openAmount * 20);
+            ctx.lineTo(x - openAmount * 15, y + height + openAmount * 40);
+            ctx.lineTo(x, y + height + openAmount * 20);
+            ctx.fillStyle = '#5D4037';
+            ctx.fill();
+
+            // Right side of drawer
+            ctx.beginPath();
+            ctx.moveTo(x + width, y);
+            ctx.lineTo(x + width + openAmount * 15, y + openAmount * 20);
+            ctx.lineTo(x + width + openAmount * 15, y + height + openAmount * 40);
+            ctx.lineTo(x + width, y + height + openAmount * 20);
+            ctx.fillStyle = '#5D4037';
+            ctx.fill();
+
+            // Drawer front
+            ctx.fillStyle = '#8B4513';
+            ctx.beginPath();
+            ctx.moveTo(x - openAmount * 15, y + openAmount * 20);
+            ctx.lineTo(x + width + openAmount * 15, y + openAmount * 20);
+            ctx.lineTo(x + width + openAmount * 15, y + height + openAmount * 40);
+            ctx.lineTo(x - openAmount * 15, y + height + openAmount * 40);
+            ctx.closePath();
+            ctx.fill();
+
+            // Drawer handle
+            ctx.fillStyle = '#FFD700';
+            ctx.beginPath();
+            ctx.ellipse(
+                x + width/2, 
+                y + openAmount * 20 + 15, 
+                8, 
+                4, 
+                0, 
+                0, 
+                Math.PI * 2
+            );
+            ctx.fill();
+        }
+
+        function drawDesk() {
+            // Desk top
+            ctx.fillStyle = '#8B4513';
+            ctx.fillRect(50, 150, 700, 20);
+
+            // Desk legs
+            ctx.fillStyle = '#654321';
+            ctx.fillRect(80, 170, 30, 180);
+            ctx.fillRect(690, 170, 30, 180);
+
+            // Wood grain effect on desk top
+            ctx.strokeStyle = 'rgba(0,0,0,0.1)';
+            for(let i = 0; i < 20; i++) {
+                ctx.beginPath();
+                ctx.moveTo(50 + i * 35, 150);
+                ctx.lineTo(50 + i * 35, 170);
+                ctx.stroke();
+            }
+
+            // Calculate drawer open amount (0 to 1)
+            const drawerOpen = (Math.sin(time * 1.5) + 1) / 2;
+            
+            // Draw drawer
+            drawDrawer(300, 170, 200, 60, drawerOpen);
+
+            // Draw duck in drawer when it's open
+            if (drawerOpen > 0.2) {
+                const drawerDuckScale = Math.min(drawerOpen, 1);
+                ctx.save();
+                ctx.translate(400, 200 + drawerOpen * 20);
+                ctx.scale(drawerDuckScale * 0.8, drawerDuckScale * 0.8);
+                drawDuck(0, 0, time * 2, true);
+                ctx.restore();
+            }
+        }
+
+        function drawDuck(x, y, t, isInDrawer = false) {
+            ctx.save();
+            ctx.translate(x, y);
+            
+            if (!isInDrawer) {
+                const swayAmount = Math.sin(t * 2) * 3;
+                ctx.rotate(swayAmount * Math.PI / 180);
+            }
+
+            // Create gradient for the duck's body
+            const gradient = ctx.createRadialGradient(25, 0, 0, 25, 10, 40);
+            gradient.addColorStop(0, '#fff7c4');  // Lighter yellow center
+            gradient.addColorStop(0.5, '#ffd700'); // Golden yellow
+            gradient.addColorStop(1, '#ffc400');   // Slightly darker edge
+
+            // Main body (more egg-shaped)
+            ctx.beginPath();
+            ctx.moveTo(0, 15);
+            ctx.bezierCurveTo(0, -10, 50, -10, 50, 15);
+            ctx.bezierCurveTo(50, 40, 0, 40, 0, 15);
+            ctx.fillStyle = gradient;
+            ctx.fill();
+
+            // Pronounced tail
+            ctx.beginPath();
+            ctx.moveTo(-2, 15);
+            ctx.bezierCurveTo(-15, 5, -15, 25, -2, 15);
+            ctx.fillStyle = gradient;
+            ctx.fill();
+
+            // Add secondary tail detail
+            ctx.beginPath();
+            ctx.moveTo(-2, 15);
+            ctx.bezierCurveTo(-8, 10, -8, 20, -2, 15);
+            ctx.fillStyle = '#ffd700';
+            ctx.fill();
+
+            // Body highlight (more pronounced)
+            ctx.beginPath();
+            ctx.ellipse(25, 5, 22, 12, -0.2, 0, Math.PI);
+            ctx.fillStyle = 'rgba(255,255,255,0.5)';
+            ctx.fill();
+
+            // Head (more characteristic rubber duck shape)
+            ctx.beginPath();
+            ctx.arc(50, 5, 18, 0, Math.PI * 2);
+            ctx.fillStyle = gradient;
+            ctx.fill();
+
+            // Head highlight
+            ctx.beginPath();
+            ctx.ellipse(50, 0, 12, 6, -0.2, 0, Math.PI);
+            ctx.fillStyle = 'rgba(255,255,255,0.5)';
+            ctx.fill();
+
+            // Bill (wider and more characteristic)
+            ctx.beginPath();
+            ctx.moveTo(60, 5);
+            ctx.bezierCurveTo(75, 0, 80, 2, 75, 5);
+            ctx.bezierCurveTo(80, 8, 75, 10, 60, 10);
+            ctx.closePath();
+            const billGradient = ctx.createLinearGradient(60, 0, 80, 0);
+            billGradient.addColorStop(0, '#ff9800');
+            billGradient.addColorStop(1, '#f57c00');
+            ctx.fillStyle = billGradient;
+            ctx.fill();
+            
+            // Eye
+            ctx.beginPath();
+            ctx.arc(58, 2, 2.5, 0, Math.PI * 2);
+            ctx.fillStyle = '#000';
+            ctx.fill();
+
+            // Eye highlight
+            ctx.beginPath();
+            ctx.arc(59, 1, 1, 0, Math.PI * 2);
+            ctx.fillStyle = '#fff';
+            ctx.fill();
+
+            if (!isInDrawer) {
+                // Duck shadow on desk (elongated for sliding effect)
+                ctx.fillStyle = 'rgba(0,0,0,0.08)';
+                ctx.beginPath();
+                ctx.ellipse(25, 45, 30, 6, 0, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            ctx.restore();
+        }
+
+        function animate() {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw desk first
+            drawDesk();
+            
+            // Draw ducks on top of desk
+            for (let i = 0; i < duckCount; i++) {
+                let x = ((time * 40 + i * duckSpacing) % (canvas.width + duckSpacing)) - duckSpacing;
+                if (x < -duckSpacing) x += canvas.width + duckSpacing;
+                drawDuck(x, 100, time + i * 0.5);
+            }
+            
+            time += 0.02;
+            requestAnimationFrame(animate);
+        }
+
+        // Start animation
+        animate();
+    </script>
+</body>
+</html> 

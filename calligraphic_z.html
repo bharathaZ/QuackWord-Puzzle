@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calligraphic Z with Rose</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f5f5f5;
+        }
+        canvas {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas" width="400" height="400"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Function to draw a rose petal
+        function drawPetal(x, y, angle, size) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(angle);
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.bezierCurveTo(
+                size * 0.5, -size * 0.5,
+                size * 1.5, -size * 0.5,
+                size * 2, 0
+            );
+            ctx.bezierCurveTo(
+                size * 1.5, size * 0.5,
+                size * 0.5, size * 0.5,
+                0, 0
+            );
+            ctx.fill();
+            ctx.restore();
+        }
+
+        // Draw the calligraphic Z
+        ctx.lineWidth = 8;
+        ctx.strokeStyle = '#2c1810';
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+
+        // Top horizontal stroke
+        ctx.beginPath();
+        ctx.moveTo(100, 100);
+        ctx.bezierCurveTo(150, 95, 200, 100, 300, 100);
+        ctx.stroke();
+
+        // Diagonal stroke
+        ctx.beginPath();
+        ctx.moveTo(280, 110);
+        ctx.bezierCurveTo(200, 180, 180, 220, 120, 290);
+        ctx.stroke();
+
+        // Bottom horizontal stroke
+        ctx.beginPath();
+        ctx.moveTo(100, 300);
+        ctx.bezierCurveTo(150, 295, 200, 300, 300, 300);
+        ctx.stroke();
+
+        // Draw rose
+        ctx.fillStyle = '#e91e63'; // Pink color for rose
+        
+        // Draw petals in a spiral pattern
+        for (let i = 0; i < 12; i++) {
+            const angle = i * Math.PI / 6;
+            const x = 180 + Math.cos(angle) * (20 + i * 3);
+            const y = 200 + Math.sin(angle) * (20 + i * 3);
+            drawPetal(x, y, angle + Math.PI / 2, 15);
+        }
+
+        // Draw center of the rose
+        ctx.fillStyle = '#c2185b'; // Darker pink for center
+        ctx.beginPath();
+        ctx.arc(180, 200, 10, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Draw leaves
+        ctx.fillStyle = '#4caf50';
+        ctx.beginPath();
+        ctx.moveTo(160, 240);
+        ctx.bezierCurveTo(140, 260, 130, 270, 120, 280);
+        ctx.bezierCurveTo(140, 270, 150, 260, 160, 240);
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.moveTo(200, 230);
+        ctx.bezierCurveTo(220, 250, 230, 260, 240, 270);
+        ctx.bezierCurveTo(220, 260, 210, 250, 200, 230);
+        ctx.fill();
+    </script>
+</body>
+</html> 

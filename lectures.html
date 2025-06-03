@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects - Gihan Jayatilaka</title>
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="nav-container">
+                <h1>Gihan Jayatilaka</h1>
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="biography.html">Biography</a></li>
+                    <li><a href="papers.html">Papers</a></li>
+                    <li><a href="projects.html" class="active">Projects</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="projects">
+            <h2>Research Projects</h2>
+            
+            <div class="project-filters">
+                <button class="filter-btn active" data-filter="all">All Projects</button>
+                <button class="filter-btn" data-filter="vision">Computer Vision</button>
+                <button class="filter-btn" data-filter="ml">Machine Learning</button>
+            </div>
+
+            <div class="projects-grid">
+                <article class="project-item vision">
+                    <div class="project-image">
+                        <img src="images/3d-occupancy.jpg" alt="3D Semantic Occupancy Prediction">
+                    </div>
+                    <div class="project-info">
+                        <h3>3D Semantic Occupancy Prediction</h3>
+                        <p class="project-meta">2024-2025</p>
+                        <p class="project-description">Development of a unified spatio-temporal framework for predicting 3D semantic occupancy using multiple perspective views. Winner of Best Paper Award at ML4AD Workshop, AAAI 2025.</p>
+                        <div class="project-links">
+                            <a href="https://github.com/gihanjayatilaka/3d-occupancy" class="button" target="_blank">View Code</a>
+                            <a href="#" class="button">Demo</a>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="project-item ml">
+                    <div class="project-image">
+                        <img src="images/deeplight.jpg" alt="DeepLight Project">
+                    </div>
+                    <div class="project-info">
+                        <h3>DeepLight: Screen-Camera Communication</h3>
+                        <p class="project-meta">2021</p>
+                        <p class="project-description">Implementation of robust and unobtrusive real-time screen-camera communication system for real-world displays. Winner of Best Artifact Award at IPSN 2021.</p>
+                        <div class="project-links">
+                            <a href="https://github.com/gihanjayatilaka/deeplight/" class="button" target="_blank">Source Code</a>
+                            <a href="#" class="button">Documentation</a>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Gihan Jayatilaka. All rights reserved.</p>
+    </footer>
+
+    <script src="scripts/main.js"></script>
+</body>
+</html> 
