@@ -1,5 +1,19 @@
+# System files
 .DS_Store
-node_modules/
-*.log
+Thumbs.db
+
+# Editor directories and files
+.idea/
 .vscode/
-.idea/ 
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+node_modules/ 

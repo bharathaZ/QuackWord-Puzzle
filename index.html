@@ -3,55 +3,211 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Canvas Animations</title>
+    <title>Duck Rotation Game</title>
     <style>
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 2rem;
-            line-height: 1.6;
-            background-color: #f5f5f5;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+            padding: 20px;
         }
-        .container {
-            background: white;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #333;
-            margin-bottom: 1.5rem;
-        }
-        .animation-link {
-            display: block;
-            padding: 1rem;
-            margin: 1rem 0;
-            background: #f0f7ff;
+        canvas {
+            background-color: white;
             border-radius: 8px;
-            color: #0066cc;
-            text-decoration: none;
-            transition: background-color 0.2s;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
         }
-        .animation-link:hover {
-            background: #e1efff;
+        #clueArea {
+            display: none;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            margin-top: 20px;
+            text-align: center;
+            width: 80%;
+            max-width: 600px;
         }
-        .description {
-            color: #666;
-            margin-bottom: 2rem;
+        #clueText {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        #answerBoxes {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 15px;
+            align-items: center;
+        }
+        .word-group {
+            display: flex;
+            gap: 10px;
+            position: relative;
+        }
+        .word-group:not(:last-child)::after {
+            content: "";
+            position: absolute;
+            right: -25px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 10px;
+            height: 10px;
+            background-color: #888;
+            border-radius: 50%;
+            opacity: 0.5;
+        }
+        .answer-box {
+            width: 40px;
+            height: 40px;
+            border: 2px solid #333;
+            border-radius: 4px;
+            font-size: 24px;
+            text-align: center;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+        }
+        .answer-box.correct {
+            border-color: #4CAF50;
+            background-color: #E8F5E9;
+            color: #2E7D32;
+        }
+        .answer-box.incorrect {
+            border-color: #f44336;
+            background-color: #FFEBEE;
+            color: #c62828;
+            animation: shake 0.5s ease;
+        }
+        #successMessage, #errorMessage {
+            display: none;
+            font-weight: bold;
+            margin-top: 15px;
+            font-size: 18px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        #successMessage {
+            color: #4CAF50;
+            background-color: #E8F5E9;
+        }
+        #errorMessage {
+            color: #f44336;
+            background-color: #FFEBEE;
+        }
+        @keyframes celebrate {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        .celebrate {
+            animation: celebrate 0.5s ease;
+        }
+        #finalAnswerContainer {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        #finalAnswerBoxes {
+            display: flex;
+            gap: 5px;
+            margin-top: 10px;
+        }
+        .final-answer-word {
+            display: flex;
+            gap: 5px;
+            margin: 0 10px;
+        }
+        .final-answer-box {
+            width: 30px;
+            height: 30px;
+            border: 2px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            text-transform: uppercase;
+            background: white;
+        }
+        .final-answer-box.highlighted {
+            border-color: #ff4444;
+            border-width: 3px;
+        }
+        #gameContainer {
+            position: relative;
+        }
+        #canvas {
+            border: 1px solid #ccc;
+        }
+        #clueContainer {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            display: none;
+            text-align: center;
+            min-width: 300px;
+            z-index: 1000;
+        }
+        .answer-boxes {
+            display: flex;
+            gap: 5px;
+            margin-top: 10px;
+            justify-content: center;
+        }
+        .answer-box:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+        .word-separator {
+            margin: 0 10px;
+            font-size: 20px;
+            align-self: center;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Canvas Animations</h1>
-        <p class="description">A collection of interactive canvas animations created with HTML5 Canvas and JavaScript.</p>
-        
-        <a href="moving_ducks.html" class="animation-link">
-            🦆 Rubber Ducks on a Desk
-            <br>
-            <small>Watch adorable rubber ducks glide across a wooden desk with animated drawer interactions.</small>
-        </a>
+    <div id="finalAnswerContainer">
+        <div id="finalAnswerBoxes">
+            <div class="final-answer-word">
+                <div class="final-answer-box" data-index="0"></div>
+                <div class="final-answer-box" data-index="1"></div>
+                <div class="final-answer-box" data-index="2"></div>
+                <div class="final-answer-box" data-index="3"></div>
+            </div>
+            <div class="final-answer-word">
+                <div class="final-answer-box" data-index="4"></div>
+                <div class="final-answer-box" data-index="5"></div>
+                <div class="final-answer-box" data-index="6"></div>
+                <div class="final-answer-box" data-index="7"></div>
+            </div>
+        </div>
     </div>
+    <div id="gameContainer">
+        <canvas id="canvas" width="600" height="600"></canvas>
+        <div id="clueContainer">
+            <p id="clueText"></p>
+            <div id="answerBoxes" class="answer-boxes"></div>
+            <p id="successMessage">Correct!</p>
+            <p id="errorMessage">Try again!</p>
+        </div>
+    </div>
+    <div id="congratsContainer" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.2); text-align: center; z-index: 2000;">
+        <h2 style="color: #4CAF50; margin-bottom: 15px;">Congratulations!</h2>
+        <p style="font-size: 18px; margin-bottom: 20px;">And Good Luck!</p>
+        <button onclick="this.parentElement.style.display='none'" style="padding: 8px 16px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">Close</button>
+    </div>
+    <script src="game.js"></script>
 </body>
 </html> 

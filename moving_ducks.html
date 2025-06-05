@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ducks on Desk</title>
+    <title>Congratulations!</title>
     <style>
         body {
             display: flex;
@@ -26,41 +26,83 @@
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
 
-        // Parameters
-        const duckSpacing = 120;
-        const duckCount = 5;
+        // Animation parameters
         let time = 0;
+        let lastSpawnTime = 0;
+        const SPAWN_COOLDOWN = 2; // seconds between duck spawns
 
-        function drawDrawer(x, y, width, height, openAmount) {
+        // Duck class
+        class Duck {
+            constructor() {
+                this.x = 400;  // start at drawer
+                this.y = 170;  // drawer height
+                this.active = true;
+                this.isJumping = true;
+                this.jumpProgress = 0;
+                this.direction = -1; // Always move left
+            }
+
+            update() {
+                // Always move horizontally
+                this.x += this.direction * 2;
+
+                if (this.isJumping) {
+                    // Simple jump arc
+                    this.jumpProgress += 0.03;
+                    if (this.jumpProgress >= 1) {
+                        this.isJumping = false;
+                        this.y = 300; // ground level
+                    } else {
+                        // Simple parabolic arc
+                        this.y = 170 + (300 - 170) * this.jumpProgress + 
+                                Math.sin(Math.PI * this.jumpProgress) * -80;
+                    }
+                }
+
+                // Remove duck when it moves off screen to the left
+                if (this.x < -50) {
+                    this.active = false;
+                    console.log('Duck removed at x:', this.x);
+                }
+            }
+        }
+
+        // Active ducks array
+        let ducks = [];
+
+        // Drawer state
+        let drawerOpen = 0;
+
+        function drawDrawer(x, y, width, height) {
             // Draw drawer box interior (dark)
             ctx.fillStyle = '#3E2723';
-            ctx.fillRect(x, y, width, height + openAmount * 20);
+            ctx.fillRect(x, y, width, height + drawerOpen * 20);
 
             // Draw drawer sides with perspective
             ctx.beginPath();
             ctx.moveTo(x, y);
-            ctx.lineTo(x - openAmount * 15, y + openAmount * 20);
-            ctx.lineTo(x - openAmount * 15, y + height + openAmount * 40);
-            ctx.lineTo(x, y + height + openAmount * 20);
+            ctx.lineTo(x - drawerOpen * 15, y + drawerOpen * 20);
+            ctx.lineTo(x - drawerOpen * 15, y + height + drawerOpen * 40);
+            ctx.lineTo(x, y + height + drawerOpen * 20);
             ctx.fillStyle = '#5D4037';
             ctx.fill();
 
             // Right side of drawer
             ctx.beginPath();
             ctx.moveTo(x + width, y);
-            ctx.lineTo(x + width + openAmount * 15, y + openAmount * 20);
-            ctx.lineTo(x + width + openAmount * 15, y + height + openAmount * 40);
-            ctx.lineTo(x + width, y + height + openAmount * 20);
+            ctx.lineTo(x + width + drawerOpen * 15, y + drawerOpen * 20);
+            ctx.lineTo(x + width + drawerOpen * 15, y + height + drawerOpen * 40);
+            ctx.lineTo(x + width, y + height + drawerOpen * 20);
             ctx.fillStyle = '#5D4037';
             ctx.fill();
 
             // Drawer front
             ctx.fillStyle = '#8B4513';
             ctx.beginPath();
-            ctx.moveTo(x - openAmount * 15, y + openAmount * 20);
-            ctx.lineTo(x + width + openAmount * 15, y + openAmount * 20);
-            ctx.lineTo(x + width + openAmount * 15, y + height + openAmount * 40);
-            ctx.lineTo(x - openAmount * 15, y + height + openAmount * 40);
+            ctx.moveTo(x - drawerOpen * 15, y + drawerOpen * 20);
+            ctx.lineTo(x + width + drawerOpen * 15, y + drawerOpen * 20);
+            ctx.lineTo(x + width + drawerOpen * 15, y + height + drawerOpen * 40);
+            ctx.lineTo(x - drawerOpen * 15, y + height + drawerOpen * 40);
             ctx.closePath();
             ctx.fill();
 
@@ -69,7 +111,7 @@
             ctx.beginPath();
             ctx.ellipse(
                 x + width/2, 
-                y + openAmount * 20 + 15, 
+                y + drawerOpen * 20 + 15, 
                 8, 
                 4, 
                 0, 
@@ -89,7 +131,7 @@
             ctx.fillRect(80, 170, 30, 180);
             ctx.fillRect(690, 170, 30, 180);
 
-            // Wood grain effect on desk top
+            // Wood grain effect
             ctx.strokeStyle = 'rgba(0,0,0,0.1)';
             for(let i = 0; i < 20; i++) {
                 ctx.beginPath();
@@ -98,39 +140,33 @@
                 ctx.stroke();
             }
 
-            // Calculate drawer open amount (0 to 1)
-            const drawerOpen = (Math.sin(time * 1.5) + 1) / 2;
+            // Update drawer
+            drawerOpen = (Math.sin(time) + 1) / 2;
             
             // Draw drawer
-            drawDrawer(300, 170, 200, 60, drawerOpen);
+            drawDrawer(300, 170, 200, 60);
 
-            // Draw duck in drawer when it's open
-            if (drawerOpen > 0.2) {
-                const drawerDuckScale = Math.min(drawerOpen, 1);
-                ctx.save();
-                ctx.translate(400, 200 + drawerOpen * 20);
-                ctx.scale(drawerDuckScale * 0.8, drawerDuckScale * 0.8);
-                drawDuck(0, 0, time * 2, true);
-                ctx.restore();
+            // Spawn new duck when drawer is fully open
+            if (drawerOpen > 0.8 && time - lastSpawnTime > SPAWN_COOLDOWN) {
+                const newDuck = new Duck();
+                newDuck.x = 400; // Start at center of drawer
+                ducks.push(newDuck);
+                lastSpawnTime = time;
+                console.log('New duck spawned at x:', newDuck.x);
             }
         }
 
-        function drawDuck(x, y, t, isInDrawer = false) {
+        function drawDuck(x, y) {
             ctx.save();
             ctx.translate(x, y);
-            
-            if (!isInDrawer) {
-                const swayAmount = Math.sin(t * 2) * 3;
-                ctx.rotate(swayAmount * Math.PI / 180);
-            }
 
             // Create gradient for the duck's body
             const gradient = ctx.createRadialGradient(25, 0, 0, 25, 10, 40);
-            gradient.addColorStop(0, '#fff7c4');  // Lighter yellow center
-            gradient.addColorStop(0.5, '#ffd700'); // Golden yellow
-            gradient.addColorStop(1, '#ffc400');   // Slightly darker edge
+            gradient.addColorStop(0, '#fff7c4');
+            gradient.addColorStop(0.5, '#ffd700');
+            gradient.addColorStop(1, '#ffc400');
 
-            // Main body (more egg-shaped)
+            // Main body (egg-shaped)
             ctx.beginPath();
             ctx.moveTo(0, 15);
             ctx.bezierCurveTo(0, -10, 50, -10, 50, 15);
@@ -138,27 +174,20 @@
             ctx.fillStyle = gradient;
             ctx.fill();
 
-            // Pronounced tail
+            // Tail
             ctx.beginPath();
             ctx.moveTo(-2, 15);
             ctx.bezierCurveTo(-15, 5, -15, 25, -2, 15);
             ctx.fillStyle = gradient;
             ctx.fill();
 
-            // Add secondary tail detail
-            ctx.beginPath();
-            ctx.moveTo(-2, 15);
-            ctx.bezierCurveTo(-8, 10, -8, 20, -2, 15);
-            ctx.fillStyle = '#ffd700';
-            ctx.fill();
-
-            // Body highlight (more pronounced)
+            // Body highlight
             ctx.beginPath();
             ctx.ellipse(25, 5, 22, 12, -0.2, 0, Math.PI);
             ctx.fillStyle = 'rgba(255,255,255,0.5)';
             ctx.fill();
 
-            // Head (more characteristic rubber duck shape)
+            // Head
             ctx.beginPath();
             ctx.arc(50, 5, 18, 0, Math.PI * 2);
             ctx.fillStyle = gradient;
@@ -170,7 +199,7 @@
             ctx.fillStyle = 'rgba(255,255,255,0.5)';
             ctx.fill();
 
-            // Bill (wider and more characteristic)
+            // Bill
             ctx.beginPath();
             ctx.moveTo(60, 5);
             ctx.bezierCurveTo(75, 0, 80, 2, 75, 5);
@@ -194,13 +223,12 @@
             ctx.fillStyle = '#fff';
             ctx.fill();
 
-            if (!isInDrawer) {
-                // Duck shadow on desk (elongated for sliding effect)
-                ctx.fillStyle = 'rgba(0,0,0,0.08)';
-                ctx.beginPath();
-                ctx.ellipse(25, 45, 30, 6, 0, 0, Math.PI * 2);
-                ctx.fill();
-            }
+            // Simple shadow (gets larger as duck gets closer to ground)
+            ctx.fillStyle = 'rgba(0,0,0,0.08)';
+            ctx.beginPath();
+            const shadowScale = Math.min((y - 170) / (300 - 170), 1); // 0 when at drawer, 1 when on ground
+            ctx.ellipse(25, 45, 30 * shadowScale, 6 * shadowScale, 0, 0, Math.PI * 2);
+            ctx.fill();
 
             ctx.restore();
         }
@@ -209,14 +237,21 @@
             // Clear canvas
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            // Draw desk first
+            // Draw desk and drawer
             drawDesk();
             
-            // Draw ducks on top of desk
-            for (let i = 0; i < duckCount; i++) {
-                let x = ((time * 40 + i * duckSpacing) % (canvas.width + duckSpacing)) - duckSpacing;
-                if (x < -duckSpacing) x += canvas.width + duckSpacing;
-                drawDuck(x, 100, time + i * 0.5);
+            // Update and draw ducks
+            ducks = ducks.filter(duck => {
+                duck.update();
+                if (duck.active) {
+                    drawDuck(duck.x, duck.y);
+                }
+                return duck.active;
+            });
+            
+            // Log number of active ducks
+            if (ducks.length > 0) {
+                console.log('Active ducks:', ducks.length, 'First duck position:', ducks[0].x, ducks[0].y);
             }
             
             time += 0.02;
